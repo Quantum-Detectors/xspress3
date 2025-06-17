@@ -28,6 +28,7 @@
 #include <string>
 //needs c++11 #include <chrono>
 //needs c++11 #include <unistd.h>
+#include <unistd.h>
 #include <stdexcept>
 #include "dirent.h"
 #include <sys/types.h>
@@ -1969,7 +1970,7 @@ int Xspress3::getNumFramesRead()
     int numFrames = 0;
     int xsp3Status = xsp3->scaler_check_progress(this->xsp3_handle_);
     if (xsp3Status < XSP3_OK) {
-        this->checkStatus(xsp3Status, "xsp3_dma_check_desc", "getNumFrameRead");
+        this->checkStatus(xsp3Status, "xsp3_dma_check_desc", "getNumFramesRead");
     } else {
         numFrames = xsp3Status;
         this->setIntegerParam(xsp3FrameCountParam, numFrames);
@@ -2034,6 +2035,7 @@ static void xsp3DataTaskC(void *xspAD)
         pXspAD->xspAsynPrint(ASYN_TRACE_FLOW, "Collect %d frames\n", numFrames);
 	// printf("data task acquire=%d, numframes=%d  / frameNumber=%d\n", (int)acquire, numFrames, frameNumber);
         while (acquire && (frameNumber < numFrames)) {
+            if (acquired == 0) { usleep(25000); }
             acquired = pXspAD->getNumFramesRead();
             if (frameNumber < acquired) {
                 lastAcquired = acquired;
