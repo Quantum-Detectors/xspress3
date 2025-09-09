@@ -393,13 +393,29 @@ asynStatus Xspress3::connect(void)
     int generation = xsp3->get_generation(xsp3_handle_, 0);
     int mark = 1;
 
-    //Set up clocks on each card
-    // TODO: XSP4_CLK_SRC_MIDPLN_LMK61E2 for Mk2 systems 
     if (xsp3_is_xsp3m_plus(0) == 1) {
       mark = 2;
     }
-    xsp3_status = xsp3->clocks_setup(xsp3_handle_, -1, generation == 3 ? XSP3M_CLK_SRC_LMK61E2 : (generation == 2 ? ((mark == 2) ? XSP4_CLK_SRC_MIDPLN_LMK61E2 : XSP3M_CLK_SRC_CDCM61004) : XSP3_CLK_SRC_XTAL),
-                                    XSP3_CLK_FLAGS_MASTER | XSP3_CLK_FLAGS_NO_DITHER, 0);
+    // Select clock source based on generation/mark
+    int clock_src = XSP3_CLK_SRC_XTAL;  // default
+
+    if (generation == 3) {
+        clock_src = XSP3M_CLK_SRC_LMK61E2;
+    } else if (generation == 2) {
+        if (mark == 2) {
+            clock_src = XSP4_CLK_SRC_MIDPLN_LMK61E2;
+        } else {
+            clock_src = XSP3M_CLK_SRC_CDCM61004;
+        }
+    }
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_FLOW, "%s Setting up clocks. Generation: %d Mark: %d Clock source: %d\n", functionName, generation, mark, clock_src);
+    xsp3_status = xsp3->clocks_setup(
+        xsp3_handle_,
+        -1,
+        clock_src,
+        XSP3_CLK_FLAGS_MASTER | XSP3_CLK_FLAGS_NO_DITHER,
+        0
+    );
     if (xsp3_status < 0) {
       checkStatus(xsp3_status, "xsp3_clocks_setup", functionName);
       status = asynError;
@@ -1201,16 +1217,7 @@ asynStatus Xspress3::setTriggerMode(int mode, int invert_f0, int invert_veto, in
           checkStatus(xsp3_status, "xsp3_set_glob_timeA", functionName);
           status = asynError;
       }
-    // TODO Is this needed for Mk2?
-    // u_int32_t actual_trigger_mode;
-    // xsp3_get_glob_timeA(xsp3_handle_, card, &actual_trigger_mode);
-    // }
-    // int xsp3_status = xsp3->set_sync_mode(xsp3_handle_, XSP3_SYNC_MIDPLANE, 0 , 0);
-    // if (xsp3_status != XSP3_OK) {
-    //   checkStatus(xsp3_status, "xsp3_set_sync_mode", functionName);
-    //   status = asynError;
     }
-
     return status;
 }
 
