@@ -101,7 +101,9 @@ TOPDIR={topdir:s}
 
 IOCNAME=ioc_{nelem:d}Channel
 SCRIPT=st.cmd
+MODE=frames
 
+export XSP3READOUT=$MODE
 APPNAME=$TOPDIR/xspress3/iocs/xspress3IOC/bin/linux-x86_64/xspress3App
 IOCDIR=$TOPDIR/xspress3/iocs/xspress3IOC/iocBoot/$IOCNAME
 
