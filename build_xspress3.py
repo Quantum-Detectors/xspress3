@@ -101,9 +101,16 @@ TOPDIR={topdir:s}
 
 IOCNAME=ioc_{nelem:d}Channel
 SCRIPT=st.cmd
-MODE=frames
+READOUT_MODE="frames"
 
-export XSP3READOUT=$MODE
+# Use default frames if XSP3READOUT is not set
+if [ -z "$XSP3READOUT" ]; then
+    echo "XSP3READOUT not set. Using default: '$READOUT_MODE'"
+    export XSP3READOUT="$READOUT_MODE"
+else
+    echo "XSP3READOUT is set to: '$XSP3READOUT' — leaving unchanged"
+fi
+
 APPNAME=$TOPDIR/xspress3/iocs/xspress3IOC/bin/linux-x86_64/xspress3App
 IOCDIR=$TOPDIR/xspress3/iocs/xspress3IOC/iocBoot/$IOCNAME
 
