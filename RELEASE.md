@@ -51,7 +51,7 @@ Fixed:
 
 Added:
 
-- Update to support Xspress 3 Mini Mk2 systems
+- Updated to version r568 (2024-12-19) to support Xspress 3 Mini Mk2 systems
 
 Changed:
 
