@@ -313,6 +313,7 @@ bool Xspress3::setInitialParameters(int maxFrames, int maxDriverFrames, int numC
     paramStatus = ((setIntegerParam(NDArraySizeX, maxSpectra) == asynSuccess) && paramStatus);
     paramStatus = ((setIntegerParam(NDArraySizeY, numChannels_) == asynSuccess) && paramStatus);
     paramStatus = ((setIntegerParam(NDArraySize, (maxSpectra * numChannels_ * sizeof(double)))  == asynSuccess) && paramStatus);
+    paramStatus = ((setIntegerParam(NDDataType, NDUInt32)  == asynSuccess) && paramStatus);
     paramStatus = ((setIntegerParam(xsp3TriggerParam, 0) == asynSuccess) && paramStatus);
     paramStatus = ((setIntegerParam(xsp3InvertF0Param, 0) == asynSuccess) && paramStatus);
     paramStatus = ((setIntegerParam(xsp3InvertVetoParam, 0) == asynSuccess) && paramStatus);
@@ -1488,6 +1489,12 @@ asynStatus Xspress3::writeInt32(asynUser *pasynUser, epicsInt32 value)
 
   else if (function == xsp3EraseStartParam) {
     getIntegerParam(xsp3EraseStartParam, &xsp3_erasestart);
+  }
+
+  else if (function == xsp3DtcEnableParam) {
+    // Turning on DTC changes array type to float
+    if (value == 1) setIntegerParam(NDDataType, NDFloat64);
+    else setIntegerParam(NDDataType, NDUInt32);;
   }
 
   else {
