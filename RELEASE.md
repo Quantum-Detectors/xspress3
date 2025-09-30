@@ -45,7 +45,10 @@ Fixed:
   in `xspress3Epics.cpp` which caused some synchronisation problems.
 - Removed duplicate calls to `setupITFG()` and `histogram_start` when starting
   an acquisition
-
+- Now explicitly set channel control registers to the desired data source (based
+  on `$(PREFIX)det1:RUN_FLAGS`) between real and playback data. This fixes an
+  issue where real data could not be acquired if the settings files being
+  loaded include playback data.
 
 ### Library
 
