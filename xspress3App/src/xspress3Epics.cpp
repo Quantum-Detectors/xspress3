@@ -138,7 +138,7 @@ Xspress3::Xspress3(const char *portName, int numChannels, int numCards, const ch
   xsp3_handle_ = 0;
   bool paramStatus = this->setInitialParameters(maxFrames, maxDriverFrames, numCards, maxSpectra);
   paramStatus = ((eraseSCAMCAROI() == asynSuccess) && paramStatus);
-  //Create the thread that readouts the data
+  //Create the thread that reads out the data
   status = (epicsThreadCreate("GeDataTask",
                               epicsThreadPriorityHigh,
                               epicsThreadGetStackSize(epicsThreadStackMedium),
@@ -437,11 +437,11 @@ asynStatus Xspress3::connect(void)
         
     }
 
-    //Restore settings from a file
+    // Restore settings from a file
     if (status == asynSuccess)
         status = restoreSettings();
 
-    //Set completion status
+    // Set completion status
     if (status == asynSuccess) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_FLOW, "%s Finished setting up Xspress3.\n", functionName);
         setStringParam(ADStatusMessage, "System Connected");
@@ -727,7 +727,7 @@ asynStatus Xspress3::restoreSettings(void)
     }
   }
 
-  //Read run flags parameter
+  // Read run flags parameter
   int xsp3_run_flags;
   getIntegerParam(xsp3RunFlagsParam, &xsp3_run_flags);
   if (xsp3_run_flags == runFlag_MCA_SPECTRA_) {
@@ -753,44 +753,89 @@ asynStatus Xspress3::restoreSettings(void)
     status = asynError;
   }
 
-    //Need to write the window params, and then read existing SCA params
-    if (status == asynSuccess) {
-        int lo_limit, hi_limit;
-        // Set window for the first Scalar ROI
-        for (int chan=0; chan<xsp3_num_channels && status == asynSuccess; chan++) {
-            getIntegerParam(chan, xsp3ChanSca5HlmParam, &hi_limit);
-            getIntegerParam(chan, xsp3ChanSca5LlmParam, &lo_limit);
-            status = setWindow(chan, 0, lo_limit, hi_limit);
-        }
+  if (status == asynSuccess) {
+    /*
+    * We need to now update the channel control registers based on whether we want to use
+    * playback data or real data signals.
+    * 
+    * This is to handle the case where the settings files includes playback data, but the
+    * user wants the run flags to get real data. When the settings files are loaded the
+    * playback data means that the data source for each channel is set to playback data
+    * only. So if the user wants to use real data we need to override the control registers
+    * for each channel to set to real ADC data.
+    */
 
-        // Set window for the first Scalar ROI
-        for (int chan=0; chan<xsp3_num_channels && status == asynSuccess; chan++) {
-            getIntegerParam(chan, xsp3ChanSca6HlmParam, &hi_limit);
-            getIntegerParam(chan, xsp3ChanSca6LlmParam, &lo_limit);
-            status = setWindow(chan, 1, lo_limit, hi_limit);
-        }
-        status = readSCAParams();
+    // Reset error status
+    xsp3_status = 0;
+
+    // Data source we want
+    u_int32_t data_source;
+    if (xsp3_run_flags == runFlag_MCA_SPECTRA_)
+    {
+      data_source = XSP3_CC_SEL_DATA_NORMAL;
+    }
+    else data_source = XSP3_CC_SEL_DATA_PB_CHAN;
+
+    // Apply data source to each channel
+    u_int32_t chan_cont = 0;
+    for (epicsInt32 channel = 0; channel < numChannels_; channel++)
+    {
+      // Existing control register values (after the settings have been restored)
+      xsp3_status &= xsp3->get_chan_cont(xsp3_handle_, channel, &chan_cont);
+
+      // Unset all data sources and set the desired source
+      chan_cont &= ~XSP3_CC_SEL_DATA(0xFF);
+      chan_cont |= XSP3_CC_SEL_DATA(data_source);
+
+      // Apply the register value
+      xsp3_status &= xsp3->set_chan_cont(xsp3_handle_, channel, chan_cont);
     }
 
-    // Set the trigger mode
-    if (status == asynSuccess) {
-       int trigger_mode, invert_f0, invert_veto, debounce;
-       getIntegerParam(xsp3TriggerModeParam, &trigger_mode);
-       getIntegerParam(xsp3InvertF0Param, &invert_f0);
-       getIntegerParam(xsp3InvertVetoParam, &invert_veto);
-       getIntegerParam(xsp3DebounceParam, &debounce);
-       status = setTriggerMode(trigger_mode, invert_f0, invert_veto, debounce );
+    // Check we succeeded in setting all of the channel data sources
+    if (xsp3_status < XSP3_OK) {
+      checkStatus(xsp3_status, "xsp3_set_chan_cont", functionName);
+      status = asynError;
+    }
+  }
+
+  //Need to write the window params, and then read existing SCA params
+  if (status == asynSuccess) {
+    int lo_limit, hi_limit;
+    // Set window for the first Scalar ROI
+    for (int chan=0; chan<xsp3_num_channels && status == asynSuccess; chan++) {
+        getIntegerParam(chan, xsp3ChanSca5HlmParam, &hi_limit);
+        getIntegerParam(chan, xsp3ChanSca5LlmParam, &lo_limit);
+        status = setWindow(chan, 0, lo_limit, hi_limit);
     }
 
-    // Read the DTC parameters
-    if (status == asynSuccess) {
-        status = readDTCParams();
+    // Set window for the first Scalar ROI
+    for (int chan=0; chan<xsp3_num_channels && status == asynSuccess; chan++) {
+        getIntegerParam(chan, xsp3ChanSca6HlmParam, &hi_limit);
+        getIntegerParam(chan, xsp3ChanSca6LlmParam, &lo_limit);
+        status = setWindow(chan, 1, lo_limit, hi_limit);
     }
+    status = readSCAParams();
+  }
 
-    // Read Trig B for DTC
-    if (status == asynSuccess) {
-        status = readTrigB();
-    }
+  // Set the trigger mode
+  if (status == asynSuccess) {
+      int trigger_mode, invert_f0, invert_veto, debounce;
+      getIntegerParam(xsp3TriggerModeParam, &trigger_mode);
+      getIntegerParam(xsp3InvertF0Param, &invert_f0);
+      getIntegerParam(xsp3InvertVetoParam, &invert_veto);
+      getIntegerParam(xsp3DebounceParam, &debounce);
+      status = setTriggerMode(trigger_mode, invert_f0, invert_veto, debounce );
+  }
+
+  // Read the DTC parameters
+  if (status == asynSuccess) {
+      status = readDTCParams();
+  }
+
+  // Read Trig B for DTC
+  if (status == asynSuccess) {
+      status = readTrigB();
+  }
 
   return status;
 }

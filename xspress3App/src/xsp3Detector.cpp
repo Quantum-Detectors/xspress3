@@ -261,3 +261,27 @@ int xsp3Detector::xsp3Api_set_sync_mode(int path, int sync_mode, int enb_global_
 
     return status;
 }
+
+int xsp3Detector::xsp3Api_get_chan_cont(int path, int chan, u_int32_t *chan_cont)
+{
+    int status;
+    status = xsp3_get_chan_cont(path, chan, chan_cont);
+
+    return status;
+}
+
+int xsp3Detector::xsp3Api_set_chan_cont(int path, int chan, u_int32_t chan_cont)
+{
+    int status;
+    status = xsp3_set_chan_cont(path, chan, chan_cont);
+
+    return status;
+}
+
+int xsp3Detector::xsp3Api_set_chan_cont2(int path, int chan, u_int32_t chan_cont2)
+{
+    int status;
+    status = xsp3_set_chan_cont2(path, chan, chan_cont2);
+
+    return status;
+}
