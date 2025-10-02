@@ -1,11 +1,12 @@
 .. xspress3epics documentation master file
 
+.. _Xspress3Epics:          https://github.com/epics-modules/xspress3
 .. _EPICS Controls System:  https://epics-controls.org/
 .. _Quantum Detectors:      https://quantumdetectors.com/
 .. _Xspress3:               https://quantumdetectors.com/products/xspress3/
 .. _epics-modules:          https://github.com/epics-modules
-.. _xspress 3 github page:   https://github.com/epics-modules/xspress3
-.. _areaDetector:           https://areadetector.github.io/master/index.html
+.. _xspress 3 github page:  https://github.com/epics-modules/xspress3
+.. _areaDetector:           https://areadetector.github.io/areaDetector/index.html
 
 .. _Diamond Light Source:   https://www.diamond.ac.uk/
 .. _Advanced Photon Source: https://www.aps.anl.gov/
@@ -15,7 +16,7 @@
 Xspress3 Epics Module
 ==================================
 
-Xspress3Epics provides support for `Quantum Detectors`_ `Xspress3`_ series of
+`Xspress3Epics`_ provides support for `Quantum Detectors`_ `Xspress3`_ series of
 pulse-counting readout electronics for the `EPICS Controls System`_. The
 Xspress 3 electronics are used with X-ray fluorescence detectors, and provide
 high performace in throughput and energy resolution.  Both single- and
@@ -26,8 +27,7 @@ Xspress 3, including the "mini" and "X" series.
 The driver was originally developed at `Diamond Light Source`_, but has been
 developed within the `epics-modules`_ for many years.  Most of the recent
 development of the driver has been a collaboration between scientists and
-engineers working at the `Advanced Photon Source`_ and `Quantum Detectors`_, and done
-at `xspress 3 github page`_.
+engineers working at the `Advanced Photon Source`_ and `Quantum Detectors`_.
 
 Documentation for the low-level API to the Xspress3 system are at `Xspress3 API Documentation`_.
 
@@ -46,3 +46,4 @@ Table of Contents
    xrfdisplay_epics
    usefulPVs
    file_structure
+   common_issue

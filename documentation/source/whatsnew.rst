@@ -4,7 +4,26 @@ Release Notes
 
 The latest version of the Xspress3 Epics driver is |release|
 
-.. _whatsnew_327_label:
+Version 3.2.9 Release Notes (Unreleased)
+--------------------------------------------
+
+New features:
+
+- Added support for the X3X Mk2 Hardware
+- Added TTL + Internal trigger mode (trigger mode 8)
+- Added better control of playback control using the run_flags variable
+- Added latest version of libraries (r568) to support X3X Mk2 Hardware
+
+Changes: 
+
+- XSP3READOUT has changed options, they now are passive, frames and list
+
+Version 3.2.8 Release Notes (2023-December-11)
+--------------------------------------------
+
+No release notes produced for this version.
+
+
 
 Version 3.2.7 Release Notes (2023-March-02)
 --------------------------------------------
