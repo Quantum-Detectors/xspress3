@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; Xspress3 Epics Module</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=84e44b8a"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release Notes" href="whatsnew.html" />
+    <link rel="prev" title="Xspress3 Epics Module" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            xspress3epics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#required-system-packages">Required System Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#required-epics-modules">Required Epics Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-build-xspress3-py-script">The <cite>build_xspress3.py</cite> script</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ioc_index.html">IOC Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="display_screens.html">Xspress 3 Display Screens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="counting_modes.html">Counting Modes for the Xspress 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrfdisplay_epics.html">Installing and using the <code class="docutils literal notranslate"><span class="pre">xrfdisplay_epics</span></code> application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usefulPVs.html">Useful PVs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="file_structure.html">HDF5 File</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">xspress3epics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<span id="install-chapter"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<p>The Xpsress3 module needs to run on a Linux computer connected to the Xspress3
+module.  Generally, these have used the Redhat/CentOS Linux distribution, and
+run when logged into the <cite>xspress3</cite> user account.  The instruction methods here
+may assume that distribution, but it may be possible to build and run the
+Xspress3 Epics driver on other Linux distribution or other user accounts.</p>
+<p>The installation process described here will build a complete and standalone
+Epics environment under the directory <cite>/home/xspress3/epics</cite>. It is certainly
+possible to install within an existing Epics development environment.</p>
+<p>The <a class="reference external" href="https://raw.githubusercontent.com/epics-modules/xspress3/master/build_xspress3.py">build_xspress3.py</a> python script is simplest and easiest way to install
+the Xspress3 driver.  Ideally, this driver can be installed with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">xspress3</span><span class="o">/</span><span class="n">epics</span>
+<span class="n">cd</span>    <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">xspress3</span><span class="o">/</span><span class="n">epics</span>
+<span class="n">wget</span>  <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">raw</span><span class="o">.</span><span class="n">githubusercontent</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">epics</span><span class="o">-</span><span class="n">modules</span><span class="o">/</span><span class="n">xspress3</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">build_xspress3</span><span class="o">.</span><span class="n">py</span>
+<span class="n">python</span> <span class="n">build_xspress3</span><span class="o">.</span><span class="n">py</span> <span class="nb">all</span>
+</pre></div>
+</div>
+<section id="required-system-packages">
+<h2>Required System Packages<a class="headerlink" href="#required-system-packages" title="Link to this heading"></a></h2>
+<p>The following packages (using the Redhat/Centos names) are required to build
+and run the Xspress3:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>re2c</p></li>
+<li><p>readline, readline-devel</p></li>
+<li><p>hdf5-devel</p></li>
+<li><p>libtiff-devel</p></li>
+<li><p>bzip-devel</p></li>
+<li><p>libxml2-devel</p></li>
+<li><p>GraphicsMagick-devel</p></li>
+</ul>
+</div></blockquote>
+<p>In addition, the <cite>telnet</cite> package is recommended to run the <cite>procServ</cite> process,
+and <cite>motif-devel</cite> is required if you intend to use the MEDM display screens.</p>
+<p>It should be possible to install all of these with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">re2c</span> <span class="n">readline</span><span class="o">-</span><span class="n">devel</span> <span class="n">hdf5</span><span class="o">-</span><span class="n">devel</span> <span class="n">libtiff</span><span class="o">-</span><span class="n">devel</span> \
+                 <span class="n">bzip</span><span class="o">-</span><span class="n">devel</span> <span class="n">libxml2</span><span class="o">-</span><span class="n">devel</span> <span class="n">GraphicsMagick</span><span class="o">-</span><span class="n">devel</span> \
+                 <span class="n">maktelnet</span> <span class="n">motif</span><span class="o">-</span><span class="n">devel</span>
+</pre></div>
+</div>
+</section>
+<section id="required-epics-modules">
+<h2>Required Epics Modules<a class="headerlink" href="#required-epics-modules" title="Link to this heading"></a></h2>
+<p>The following Epics modules are needed to build and run the Xspress3
+Input/Output Controller program, with the currently installed versions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>epics base 7.0.3.1</p></li>
+<li><p>asyn 4-38</p></li>
+<li><p>seq  2.2.6</p></li>
+<li><p>ipac 2.15</p></li>
+<li><p>alive R1-1-1</p></li>
+<li><p>std R3-6</p></li>
+<li><p>autosave R5-10</p></li>
+<li><p>iocStats 3.1.16</p></li>
+<li><p>busy R1-7-2</p></li>
+<li><p>sscan R2-11-3</p></li>
+<li><p>calc R3-7-3</p></li>
+<li><p>areaDetector R3-9</p></li>
+<li><p>adSupport R1-9</p></li>
+<li><p>adCore R3-9</p></li>
+<li><p>procServ 2.6.0</p></li>
+<li><p>medm 3.0.3</p></li>
+<li><p>xspress 3.2.7</p></li>
+</ul>
+</div></blockquote>
+<p>The <a class="reference external" href="https://raw.githubusercontent.com/epics-modules/xspress3/master/build_xspress3.py">build_xspress3.py</a> script will download these versions of these packages
+from the <a class="reference external" href="https://millenia.cars.aps.anl.gov/software/xspress3/sources">xspress3 sources</a> web site, hosted at
+<a class="reference external" href="https://millenia.cars.aps.anl.gov/software/xspress3">https://millenia.cars.aps.anl.gov/software/xspress3</a>.  We expect that newer
+versions of any of the above packages should also work.</p>
+</section>
+<section id="the-build-xspress3-py-script">
+<h2>The <cite>build_xspress3.py</cite> script<a class="headerlink" href="#the-build-xspress3-py-script" title="Link to this heading"></a></h2>
+<p>The <a class="reference external" href="https://raw.githubusercontent.com/epics-modules/xspress3/master/build_xspress3.py">build_xspress3.py</a> python script will</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>check the installation of required system packages.</p></li>
+<li><p>download the required Epics modules.</p></li>
+<li><p>configure the require Epics modules, which typically involves writing
+environmental variables into a file in the <code class="docutils literal notranslate"><span class="pre">configure</span></code> folder for each
+of the modules.</p></li>
+<li><p>write a master <cite>Build.sh</cite> shell script.</p></li>
+<li><p>run the <cite>Build.sh</cite> shell script to build each module.  This shell script
+may be useful for debugging the build process.</p></li>
+<li><p>Download and install <a class="reference external" href="https://xraypy.github.io/xraylarch">xraylarch</a> for its <cite>xrfdisplay_epics</cite>
+application (see <a class="reference internal" href="xrfdisplay_epics.html#xrf-display-chapter"><span class="std std-ref">Installing and using the xrfdisplay_epics application</span></a>).</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Xspress3 Epics Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="whatsnew.html" class="btn btn-neutral float-right" title="Release Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Public Domain.
+      <span class="lastupdated">Last updated on 2025-October-07.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
