@@ -3,7 +3,7 @@ Common Issues
 
 
 Acquision does not end
-==================
+=======================
 
 Using internal mode the acquisition does not end and stops 2 off the expected number of frames.
 

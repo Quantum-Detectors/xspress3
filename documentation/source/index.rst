@@ -46,4 +46,4 @@ Table of Contents
    xrfdisplay_epics
    usefulPVs
    file_structure
-   common_issue
+   common_issues

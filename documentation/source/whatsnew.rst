@@ -19,7 +19,7 @@ Changes:
 - XSP3READOUT has changed options, they now are passive, frames and list
 
 Version 3.2.8 Release Notes (2023-December-11)
---------------------------------------------
+-----------------------------------------------
 
 No release notes produced for this version.
 
