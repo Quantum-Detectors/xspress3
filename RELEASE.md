@@ -9,6 +9,28 @@ changes to the driver and underlying xspress3 library.
 
 This file tracks changes since v3.2.8.
 
+## Unreleased
+
+### Driver
+
+- Now use ADC clock instead of midplane for X3X2 when only a single card is present
+
+### Library
+
+- Updated to version r601 from 2026-11-12
+
+  - xspress3: Changes to xspress3.c and xspress3_save_restore.c to default to sync_mode=XSP3_SYNC_MIDPLANE for x3m2 with > 1 card.
+  - Changes to xspress3_clocks.c to not use the floating timestamp sync input when using a single card X3m2 
+  - Xspress3mini: xsp3mp_decode_list shows padding
+  - xspress3: Bug fix to xspress3_adjust_trigger_b_threshold_ringing() when data missing on a channel.
+  - Xspress3: xspress3_calib_triggers.c: Fixed uninitialised variables
+  - xspress3: added scale-by-rate functionality
+  - Xspress4: Work on xspress3_measure_trigger_b and of event tail IIR
+  - Xspress4: fine time top from stream 14
+  - Xspress3/4: Servo IIR Filter
+  - Xspress3/mini/4: Debugged startup of xspress4d with firmware work on I2C glitch on power-up.
+
+
 ## 3.3.0  2026-Jan-30
 
 ### Driver
