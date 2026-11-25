@@ -391,24 +391,23 @@ asynStatus Xspress3::connect(void)
   } else {
     setIntegerParam(xsp3ConnectedParam, 1);
 
+    // Select clock source based on generation/mark
     int generation = xsp3->get_generation(xsp3_handle_, 0);
     int mark = 1;
 
-    if (xsp3_is_xsp3m_plus(0) == 1) {
-      mark = 2;
-    }
-    // Select clock source based on generation/mark
-    int clock_src = XSP3_CLK_SRC_XTAL;  // default
+    // Default clock source for single board can be automatically chosen
+    // - XSP3M_CLK_SRC_LMK61E2 for Mk2 mini
+    // - XSP3M_CLK_SRC_CDCM61004 for Mk1 mini
+    int clock_src = XSP3_CLK_SRC_XTAL;
 
-    if (generation == 3) {
-        clock_src = XSP3M_CLK_SRC_LMK61E2;
-    } else if (generation == 2) {
-        if (mark == 2) {
-            clock_src = XSP4_CLK_SRC_MIDPLN_LMK61E2;
-        } else {
-            clock_src = XSP3M_CLK_SRC_CDCM61004;
-        }
+    if (xsp3_num_cards > 1 && xsp3_is_xsp3m_plus(0) == 1)
+    {
+      // Use midplane for multiple X3X2 cards
+      mark = 2;
+      clock_src = XSP4_CLK_SRC_MIDPLN_LMK61E2;
     }
+
+    printf("Generation: %d, mark: %d, clock source: %d\n", generation, mark, clock_src);
     asynPrint(this->pasynUserSelf, ASYN_TRACE_FLOW, "%s Setting up clocks. Generation: %d Mark: %d Clock source: %d\n", functionName, generation, mark, clock_src);
     xsp3_status = xsp3->clocks_setup(
         xsp3_handle_,
