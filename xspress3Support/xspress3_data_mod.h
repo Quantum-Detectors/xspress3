@@ -179,7 +179,7 @@ extern "C" {
 #endif
 #undef XSP3_MAX_MODNAME
 #define XSP3_MAX_MODNAME 100
-#define XSP3_MAX_CARDS 16
+#define XSP3_MAX_CARDS 18
 #define XSP3_SCOPE_MODULE_MAGIC "xsp3scp"
 
 /**
@@ -258,7 +258,7 @@ typedef struct xsp4_scope_data_module
 #define XSP3_SCOPE_POINTS_FIXED (64*1024*1024)		//!< Fixed sized scope mode number of points in XSP3_SCOPE_MOD_LAYOUT_DIFFS_TEST
 
 
-XSP3ScopeModule *xsp3_scope_mod_create(char *name, int num_cards, int lwords_per_card, mh_com ** mod_head, int layout);
+XSP3ScopeModule *xsp3_scope_mod_create(const char *name, int num_cards, int lwords_per_card, mh_com ** mod_head, int layout);
 u_int16_t * xsp3_scope_mod_get_ptr(XSP3ScopeModule *mod, int card, int stream);
 int xsp3_scope_mod_get_inc(XSP3ScopeModule *mod);
 int xsp3_scope_mod_get_nstreams(XSP3ScopeModule *mod); 
@@ -278,11 +278,12 @@ int xsp3_scope_calc_num_t(XSP3ScopeModule *mod);
 #define XSP3_SCOPE_NUM_SRC4		16
 #define XSP3_SCOPE_NUM_SRC5		16
 
-#define XSP4_SCOPE_NUM_SRC0	 	 16
-#define XSP4_SCOPE_NUM_SRC1	 	 16
-#define XSP4_SCOPE_NUM_SRC2TO5	 12
-#define XSP4_SCOPE_NUM_SRC6TO11  15
-#define XSP4_SCOPE_NUM_SRC12TO15 16
+#define XSP4_SCOPE_NUM_SRC0	 	 	16
+#define XSP4_SCOPE_NUM_SRC1	 	 	16
+#define XSP4_SCOPE_NUM_SRC2TO5	 	13
+#define XSP4_SCOPE_NUM_SRC6TO9  	15
+#define XSP4_SCOPE_NUM_SRC10TO11  	16
+#define XSP4_SCOPE_NUM_SRC12TO15 	16
 
 #define XSP4_SCOPE_NUM_SRC_CSHR	12
 
@@ -317,14 +318,17 @@ extern const char *xsp3_scope_alt_names_s5[XSP3_SCOPE_NUM_SRC5][16];
 extern const char *xsp4_scope_name_s0[16];
 extern const char *xsp4_scope_name_s1[16];
 extern const char *xsp4_scope_name_s2to5[16];
-extern const char *xsp4_scope_name_s6to11[16];
+extern const char *xsp4_scope_name_s6to9[16];
+extern const char *xsp4_scope_name_s10to11[16];
 extern const char *xsp4_scope_name_s12[16];
 extern const char *xsp4_scope_name_s13[16];
-extern const char *xsp4_scope_name_s14to15[16];
+extern const char *xsp4_scope_name_s14[16];
+extern const char *xsp4_scope_name_s15[16];
 extern const char *xsp4_scope_alt_names_s0[XSP4_SCOPE_NUM_SRC0][16];
 extern const char *xsp4_scope_alt_names_s1[XSP4_SCOPE_NUM_SRC1][16];
 extern const char *xsp4_scope_alt_names_s2to5[XSP4_SCOPE_NUM_SRC2TO5][16];
-extern const char *xsp4_scope_alt_names_s6to11[XSP4_SCOPE_NUM_SRC6TO11][16];
+extern const char *xsp4_scope_alt_names_s6to9[XSP4_SCOPE_NUM_SRC6TO9][16];
+extern const char *xsp4_scope_alt_names_s10to11[XSP4_SCOPE_NUM_SRC10TO11][16];
 extern const char *xsp4_scope_alt_names_s12to13[XSP4_SCOPE_NUM_SRC12TO15][16];
 extern const char *xsp4_scope_cshr_src_name[16];
 extern const char *xsp4_scope_cshr_alt_name[XSP4_SCOPE_NUM_SRC_CSHR][16];

@@ -92,7 +92,7 @@
 #define XSP3_HW_DEFINED_SCALERS 8
 
 #define XSP3_ENERGIES 4096
-#define XSP3_MAX_CARDS 16			//!< Maximum number of cards in a logical system
+#define XSP3_MAX_CARDS 18			//!< Maximum number of cards in a logical system
 #define XSP3_MAX_CARD_INDEX 62		//!< Maximum card index across all systems
 #define XSP3_MAX_PATH 34
 #define XSP3_MAX_IP_CHARS 16
@@ -177,6 +177,11 @@ typedef enum {XspressGenError= -1, XspressGen3, XspressGen3V7, XspressGen3Mini, 
 
 typedef enum {XspressReal = 0, XspressDummy3=1, XspressDummy3V7=2, XspressDummy3Mini=3, XspressDummy4} XspressDummy;
 typedef enum {Xsp3UnlinkNone=0, Xsp3UnlinkCreated=1, Xsp3UnlinkAll=2} Xsp3Unlink;  // This must match ImgModUnlink
+typedef enum { 
+	Xsp3MiniPCB_Error=-1, 
+	Xsp3MiniPCB_Mk1A=0, 
+	Xsp3MiniPCB_Mk2=1, 
+	Xsp3MiniPCB_Mk1B=2 } Xsp3MiniPCB ;
 
 typedef struct _xsp3_feature
 {
@@ -185,7 +190,7 @@ typedef struct _xsp3_feature
 	char lead_tail_corr, output_format, format_details_a, format_details_b, global_reset, timing_source, timing_generator, scope_mode;
 	char farm_mode, soft_scalers, ack_eof;
 	XspressGeneration generation;
-	int xsp3m_plus;		// Modifies XspressGen3Mini to support x3mini+ ADC board with SPI ADC control serdes control and mid-plane.
+	Xsp3MiniPCB xsp3m_plus;		// Modifies XspressGen3Mini to support x3mini+ ADC board with SPI ADC control serdes control and mid-plane.
 						// Note that data output histogramming threads are determined from output_format to allow possible back port to Xspress3mini
 	int num_scope_dma, num_playback_streams;
 	int max_real_dma_stream;
@@ -612,6 +617,14 @@ typedef struct
 	int unused[8];			//!< For future expansion
 } Xsp3CShrControl;
 
+typedef struct 
+{
+	int count_mode;			//!< See XSP3_SCALE_BY_RATE_COUNT_MODE_OFF etc
+	int count_period;		//!< See XSP3_SCALE_BY_RATE_MEAS_TIME125US etc
+	int max_rate;			//!< See XSP3_SCALE_BY_RATE_MAX_RATE8M
+	int enable;
+	double iir_scaling;		//! Scaling value for first use of new reading (<= 1.0), IIR ratio = 1.0-iir_scaling
+} Xsp3ScaleByRate;
 
 #ifdef __cplusplus
 extern "C" {
@@ -761,8 +774,8 @@ int 	xsp3_calculateDeadtimeCorrectionFactors(int path, u_int32_t* hardwareScaler
 int 	xsp3_set_roi(int path, int chan, int num_roi, XSP3Roi *roi);
 int 	xsp3_init_roi(int path, int chan);
 
-MOD_IMAGE *xsp3_mkmod(char *name, int num_x, int num_y, char *x_lab, char *y_lab, int data_type, mh_com **mod_head);
-MOD_IMAGE3D * xsp3_mkmod3d ( char *name, int num_x, int num_y, int num_t, char *x_lab, char *y_lab, char *t_lab, char ** labels, int data_type, mh_com **mod_head);
+MOD_IMAGE *xsp3_mkmod(const char *name, int num_x, int num_y, char *x_lab, char *y_lab, int data_type, mh_com **mod_head);
+MOD_IMAGE3D * xsp3_mkmod3d (const char *name, int num_x, int num_y, int num_t, char *x_lab, char *y_lab, char *t_lab, char ** labels, int data_type, mh_com **mod_head);
 u_int32_t *xsp3_mod_get_ptr(void *p, int x, int y, int t);
 
 struct	xsp3_scope_data_module * xsp3_scope_get_module(int path); 
@@ -858,6 +871,7 @@ int 	xsp3_has_lead_tail_corr_width(int path, int chan, int region_num, int *num_
 int 	xsp3_has_lead_corr(int path, int card);
 int 	xsp3_has_servo_bi_linear_time(int path, int chan);
 int 	xsp3_has_servo_reset_pre_time(int path, int chan);
+int 	xsp3_has_servo_iir_tail(int path, int chan);
 XspressGeneration xsp3_get_generation(int path, int card);
 int 	xsp3_get_playback_nstreams(int path, int card);
 int 	xsp3_get_ringing_sub(int path, int chan);
@@ -1083,6 +1097,17 @@ int xsp3m_init_adc(int path, int card, u_int32_t options);
 int xsp3_is_xsp3m_plus(int path);
 int xsp3mp_read_adc_capture_status(int path, int first_chan, int num, Xsp3mpAdcCapture *status);
 int xsp3_system_stop(int path, int card);
+int xsp3_setup_servo_iir(int path, int chan, double first, double ratio, u_int32_t flags);
+int xsp3_get_servo_iir(int path, int chan, double *first_p, double *ratio_p, u_int32_t *flags_p);
+int xsp3_setup_event_iir(int path, int chan, double first, double ratio, u_int32_t flags);
+int xsp3_get_event_iir(int path, int chan, double *first_p, double *ratio_p, u_int32_t *flags_p);
+int xsp3_set_scale_by_rate(int path, int chan, Xsp3ScaleByRate *set);
+int xsp3_get_scale_by_rate(int path, int chan, Xsp3ScaleByRate *set);
+int xsp3_has_scale_by_rate(int path, int chan);
+int xsp3_write_scale_by_rate_lut(int path, int chan, int npts, double *rates, double *scalings, char *root_fname);
+int xsp3_write_lut_asc(char *fname, int npts, u_int32_t *lut);
+int xsp3_histogram_stop_list_mode_marker(int path, int chan);
+Xsp3MiniPCB xsp3_get_xsp3m_version(int path);
 
 #ifdef __cplusplus
 }
@@ -1154,6 +1179,11 @@ int xsp3_system_stop(int path, int card);
 #define XSP3_CSHR_DEST_MAPPING_B 55			//!< Destination mapping for measured charge sharing back to "central/requesting channel higher bits"
 
 #define XSP3_CHAN_CONT2 		56			//!< 2nd General Channel control register.
+#define XSP3_EVENT_IIR_FIRST 	57			//!< Scaling from event height to first adjustment vale in IIR correction filter for event tail including run_ave processin
+#define XSP3_EVENT_IIR_RATIO 	58			//!< Scaling (near 1) to make the decay tail of the IIR for event tail including run_ave processin
+#define XSP3_SERVO_IIR_FIRST 	59			//!< Scaling from event height to first adjustment vale in IIR correction filter for teh servo gradient error feedback adjustment only
+#define XSP3_SERVO_IIR_RATIO 	60			//!< Scaling (near 1) to make the decay tail of the IIR
+#define XSP3_SCALE_BY_RATE	 	61			//!< Control register for gain casling as function of count rate
 
 /** @} 
 */
@@ -1174,6 +1204,8 @@ int xsp3_system_stop(int path, int card);
 #define XSP3_REVISION_MAJOR_X3MP_MAX 41
 #define XSP3_REVISION_MAJOR_X4_MIN 48
 #define XSP3_REVISION_MAJOR_X4_MAX 63
+#define XSP3_REVISION_MAJOR_X3M1B_MIN 64
+#define XSP3_REVISION_MAJOR_X3M1B_MAX 79
 
 #define XSP3_SYNC_MODE(x)			((x)&0xFF)	//!< Build sync_mode value. Coded on bits 7..0, other spare to code e.g. long cables, termination enable etc.
 #define XSP3_SYNC_GET_MODE(x)		((x)&0xFF)	//!< get sync_mode value
@@ -1687,8 +1719,21 @@ int xsp3_system_stop(int path, int card);
 #define XSP3_CSHR_CONT_DEFAULT				(XSP3_CSHR_CONT_NEB_TRIG_DISCARD_BAD)
 #define XSP3_CSHR_CONT_DISCARD_ALL			(XSP3_CSHR_CONT_NEB_TRIG_DISCARD_BAD)
 
-
 //! [XSP3_CSHR_CONT_REGISER]
+
+//! [XSP3_SERVO_IIR_REGISTER]
+#define XSP3_EVENT_IIR_FIRST_SCALING 	(1<<20)		//!< Scaling from double to fixed point int for First correction when correcting event tail in data to servo and run_ave
+#define XSP3_EVENT_IIR_RATIO_SCALING 	(1<<24)			//!< Scaling from double to fixed point int for ratio correction.
+#define XSP3_SERVO_IIR_RATIO_SCALING 	(1<<24)			//!< Scaling from double to fixed point int for ratio correction.
+#define XSP3_SERVO_IIR_FIRST_SCALING 	(1<<22)		//!< Scaling from double to fixed point int for First correction when correction just servo tail
+
+#define XSP3_SERVO_IIR_RATIO_MASK 		0xFFFFFF		//!< Mask for ratio correction.
+#define XSP3_EVENT_IIR_RATIO_MASK 		0xFFFFFF		//!< Mask for ratio correction.
+
+#define XSP3_SERVO_IIR_RATIO_ENABLE 	(1<<31)			//!< Enable this IIR correction 
+#define XSP3_EVENT_IIR_RATIO_ENABLE 	(1<<31)			//!< Enable this IIR correction 
+
+//! [XSP3_SERVO_IIR_REGISTER]
 
 //! [XSP3_CSHR_MAPPING_REGISER]
 
@@ -1699,6 +1744,41 @@ int xsp3_system_stop(int path, int card);
 #define XSP3_CSHR_MAP_GET_REL_BOARD(x,neb)		(((x)>>(4+6*neb))&0x3)
 
 //! [XSP3_CSHR_MAPPING_REGISER]
+
+
+//! [XSP3_SCALE_BY_RATE_REGISTER]
+#define XSP3_SCALE_BY_RATE_COUNT_MODE_SET(x)	(((x)&3)<<30)	//!< Set count mode field
+#define XSP3_SCALE_BY_RATE_COUNT_MODE_GET(x)	(((x)>>30)&3)	//!< Get count mod field
+#define XSP3_SCALE_BY_RATE_COUNT_MODE_OFF		0				//!< Disbale Counting of evnets
+#define XSP3_SCALE_BY_RATE_COUNT_MODE_ALL		1				//!< Count all tiggers including neagtive energy
+#define XSP3_SCALE_BY_RATE_COUNT_MODE_POS		2				//!< Count only events with positive energy
+#define XSP3_SCALE_BY_RATE_COUNT_MODE_GOOD		3				//!< Count only events above the Good event threshold as used bu the AllGood scalar
+#define XSP3_SCALE_BY_RATE_MEAS_TIME_SET(x)		(((x)&15)<<24)	//!< Set the count rate measurement time field
+#define XSP3_SCALE_BY_RATE_MEAS_TIME_GET(x)		(((x)>>24)&15)	//!< Get the count rate measurement time field
+#define XSP3_SCALE_BY_RATE_MEAS_TIME125US		0				//!< Count events in a 125 us period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME250US		1				//!< Count events in a 250 us period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME500US		2				//!< Count events in a 500 us period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME1MS			3				//!< Count events in a   1 ms period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME2MS			4				//!< Count events in a   2 ms period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME4MS			5				//!< Count events in a   4 ms period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME8MS			6				//!< Count events in a   8 ms period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME16MS		7				//!< Count events in a  16 ms period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME32MS		8				//!< Count events in a  32 ms period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME64MS		9				//!< Count events in a  64 ms period
+#define XSP3_SCALE_BY_RATE_MEAS_TIME128MS		10				//!< Count events in a 128 ms period
+#define XSP3_SCALE_BY_RATE_MAX_RATE_SET(x)		(((x)&3)<<22)	//!< Set the maximum rate control field
+#define XSP3_SCALE_BY_RATE_MAX_RATE_GET(x)		(((x)>>22)&3)	//!< Get the maximum rate control field
+#define XSP3_SCALE_BY_RATE_MAX_RATE8M			0				//!< Shift Counters so maximum rate og 8.191 MHz fills the 10 bit LUT address
+#define XSP3_SCALE_BY_RATE_MAX_RATE4M			1				//!< Shift Counters so maximum rate og 4.0955 MHz fills the 10 bit LUT address
+#define XSP3_SCALE_BY_RATE_MAX_RATE2M			2				//!< Shift Counters so maximum rate og 2.04775 MHz fills the 10 bit LUT address
+#define XSP3_SCALE_BY_RATE_MAX_RATE1M			3				//!< Shift Counters so maximum rate og 1.023875 MHz fills the 10 bit LUT address
+#define XSP3_SCALE_BY_RATE_ENABLE				(1<<21)
+#define XSP3_SCALE_BY_RATE_RATE_SCALING_SET(x)	(((x)&0x3FFFF))	//! Set the rate scaling andhence IIR ratio			
+#define XSP3_SCALE_BY_RATE_RATE_SCALING_GET(x)	(((x)&0x3FFFF))	//! Set the rate scaling andhence IIR ratio			
+#define XSP3_SCALE_BY_RATE_RATE_SCALING			0x20000			//! Scaling value from double to int for scaling of 1.000 to use just the current value.
+
+
+//! [XSP3_SCALE_BY_RATE_REGISTER]
 
 //! [XSP3_REGIONS]
 #define XSP3_REGION_REGS			0
@@ -1715,10 +1795,12 @@ int xsp3_system_stop(int path, int card);
 #define XSP3_REGION_RAM_WIDTH_TIME	11
 #define XSP3_REGION_RAM_XTK_MAP  	12
 #define XSP3_REGION_RAM_XTK_SHAPE 	13
+#define XSP3_REGION_SCALE_BY_RATE 	14		//!< Gain scaling by rate lookup table
+
 #define XSP3_REGION_GLOB_REG		15
 //! [XSP3_REGIONS]
 
-#define XSP3_REGION_RAM_MAX		13
+#define XSP3_REGION_RAM_MAX		14
 
 #define XSP3_REGS_SIZE			64				// 26/3/2020 increased to 64 to allow for charge sharing registers.
 #define XSP3_CHAN_TP_SIZE		0
@@ -1736,6 +1818,7 @@ int xsp3_system_stop(int path, int card);
 #define XSP3_XTK_SHAPE_TIME		128
 #define XSP3_XTK_SHAPE_CHAN		16
 #define XSP3_XTK_SHAPE_SIZE	    (XSP3_XTK_SHAPE_TIME*XSP3_XTK_SHAPE_CHAN)
+#define XSP3_SCALE_BY_RATE_SIZE	1024
 
 #define XSP3_EVENT_TAIL_W4_NT	512
 #define XSP3_EVENT_TAIL_W4_NW	16
@@ -1829,6 +1912,7 @@ int xsp3_system_stop(int path, int card);
 #define XSP4_TSYNC_MODE_ASYNC			0			// Time Stamp is reset by run on each card, so NOT locked.
 #define XSP4_TSYNC_MODE_EXT_SYNC		1			// Time Stamp is reset by free running time stamp sync input
 #define XSP4_TSYNC_MODE_EXT_SYNC_RUN	2			// Time Stamp is reset by free time stamp sync input, which is reset by run on card 0.
+#define XSP4_TSYNC_MODE_NONE			3			// Time Stamp free runs from FPGA configuration with no reset
 
 
 
@@ -1837,6 +1921,8 @@ int xsp3_system_stop(int path, int card);
 
 #define XSP3_USER_TSYNC_FRAMING 		0			//!< User time stamp Sync in run mode uses framing input to reset user (output) time stamp.
 #define XSP3_USER_TSYNC_STANDALONE 		1			//!< User time stamp Sync in run mode uses repeating sync signal within each box to reset user (output) time stamp.
+#define XSP3_USER_TSYNC_TTL2 			2			//!< User time stamp Sync uses the internal TTL_IN2 signal, selected using xsp3_set_glob_trigger_select()
+#define XSP3_USER_TSYNC_TTL3 			3			//!< User time stamp Sync uses the internal TTL_IN2 signal, selected using xsp3_set_glob_trigger_select()
 #define XSP3_USER_TSYNC_TEST_GLOB_RST 	4			//!< User time stamp Sync in test mode reuses Global reset extracted from playback data
 #define XSP3_USER_TSYNC_TEST_GLOB_RST0 	5			//!< User time stamp Sync in test mode reuses Global reset extracted from playback data of channel 0 for all channels
 #define XSP3_USER_TSYNC_TEST_STANDALONE 6			//!< User time stamp Sync in test mode uses repeating sync signal within each box to reset user (output) time stamp.
@@ -2108,6 +2194,7 @@ extern char *xsp3_feature_run_ave1[2] ;
 extern char *xsp3_feature_run_ave3[2] ;
 extern char *xsp3_feature_lead_tail0[2];
 extern char *xsp3_feature_lead_tail12[4] ;
+extern char *xsp3_feature_lead_tail3[2] ;
 extern char *xsp3_feature_output_format[16] ;
 extern char *xsp3_feature_format_details_a01[4] ;
 extern char *xsp3_feature_format_details_a23[4] ;
@@ -2541,28 +2628,26 @@ typedef struct _x3m_fan_cont
 #define XSP3_FEATURE_LEAD_TAIL_GET_WIDTH(x)		(((x)>>1)&3)	//!< Get feature of event lead/tail correction based on OTD width.
 #define XSP3_FEATURE_LEAD_TAIL_WIDTH_NONE			0				//!< No dependence on Width available.
 #define XSP3_FEATURE_LEAD_TAIL_WIDTH4				1				//!< Run ave lead/tail correction depends on width(3 downto 0)
+#define XSP3_FEATURE_LEAD_TAIL_SCALE_BY_RATE	(1<<3)			//!< Run ave function includes gain scaling by rate.
 /**
 @}
 */
 
 /**
-@defgroup XSP_FEATURE_LEAD_TAIL Running Average processing options.
+@defgroup XSP_FEATURE_SERVO servo features
 @ingroup XSP3_FEATURES
 @{
 */
-#define XSP3_FEATURE_LEAD_TAIL_LEAD				1				//!< Include Correction for event lead in.
-#define XSP3_FEATURE_LEAD_TAIL_GET_WIDTH(x)		(((x)>>1)&3)	//!< Get feature of event lead/tail correction based on OTD width.
-#define XSP3_FEATURE_LEAD_TAIL_WIDTH_NONE			0				//!< No dependence on Width available.
-#define XSP3_FEATURE_LEAD_TAIL_WIDTH4				1				//!< Run ave lead/tail correction depends on width(3 downto 0)
-/**
-@}
-*/
-
 #define XSP3_FEATURE_SERVO_BASE_NONE			0				//!< No servo.
 #define XSP3_FEATURE_SERVO_BASE_PWL1			1				//!< Single table (512 points) PWL servo.
 #define XSP3_FEATURE_SERVO_BASE_PWL16			2				//!< 16 table or 1 x 2048 points PWL servo.
 #define XSP3_FEATURE_SERVO_BASE_DUAL			3				//!< Combined linear (gross) and PWL (single table) servo.
 
+/**
+@defgroup XSP_FEATURE_OUTPUT_FORMAT Output data features
+@ingroup XSP3_FEATURES
+@{
+*/
 #define XSP3_FEATURE_GET_FORMAT_A_NBITS(x)			(((x)>>0)&3)	//!< Codes Nbits energy 12, 13,14Test source A from lower 2 bits.
 #define XSP3_FEATURE_GET_FORMAT_A_AUX1(x)			(((x)>>2)&3)	//!< Codes Aux1 functionality.
 
@@ -2732,7 +2817,7 @@ typedef struct _x3m_fan_cont
 */
 /**
 	@defgroup XSP3_ITFG_ACQ_PAUSED   Internal Time Frame Generator Acquire while paused Modes.
-	In these modes the ITFG Acquires data while waiting fro 1 or more triggers, re-using the frame length register.
+	In these modes the ITFG Acquires data while waiting for 1 or more triggers, re-using the frame length register.
 	@ingroup XSP3_ITFG_REGS
 	@{
 */
@@ -3024,6 +3109,7 @@ This data is assembled nibble at a time into the 32 bit hardware registers XSP4_
 #define XSP4_SCOPE_SEL0TO5_TRIG_C_DIFF1		9	//!< Select trigger-C 1st differential
 #define XSP4_SCOPE_SEL0TO5_GLITCH			10	//!< Select the glitch detector differential
 #define XSP4_SCOPE_SEL0TO5_XTK_OUT_CORR		11	//!< Crosstalk correction block with correction.
+#define XSP4_SCOPE_SEL0TO5_SCALE_BY_RATE	12	//!< Internals of energy scaling by rate feature.
 
 /* Streams 6..11 are 4 input mux. Input, TriggerB and Servo are available in up to 14 streams as these are used for the whole detector auto calibration */
 #define XSP4_SCOPE_SEL6TO11_INP				0	//!< Select ADC input or reset detector output (see alternates)
@@ -3040,8 +3126,12 @@ This data is assembled nibble at a time into the 32 bit hardware registers XSP4_
 #define XSP4_SCOPE_SEL6TO11_CSHR_MEASURE 	13	//!< Measurement of Charge shared signals on neighbouring channels.
 #define XSP4_SCOPE_SEL6TO11_CSHR_MARKERS 	14	//!< Marking of event output as charge shared.
 
+#define XSP4_SCOPE_SEL10_FINE_TIME03 		15	//!< Special src  select for stream 10 only with channel = XSP4_SCOPE_CHAN11_FINE_TIME_TOP, to output fine time channel 0..3
+#define XSP4_SCOPE_SEL11_FINE_TIME_TOP 		15	//!< Special src  select for stream 11 only with channel = XSP4_SCOPE_CHAN11_FINE_TIME_TOP, to output fine time
 
-#define XSP4_SCOPE_CHAN_CSHR				15	//!< Special cahnnel number reads datafrom Charge sharing data paths.
+
+#define XSP4_SCOPE_CHAN_FINE_TIME	 		14	//!< Special channel for streams 10 and 11 only, overrides normal ScopeSel to output fine time
+#define XSP4_SCOPE_CHAN_CSHR				15	//!< Special channel number reads data from Charge sharing data paths.
 
 /* Streams 12..13 are 4 input mux. Input, TriggerB and Servo and are used in the 7 out of 8 or 14 out of 16 analogue modes, or can be set using the XSP4_SCOPE_SEL_DIG below */
 #define XSP4_SCOPE_SEL12TO13_INP		0	//!< Select ADC input or reset detector output (see alternates)
@@ -3054,6 +3144,7 @@ This data is assembled nibble at a time into the 32 bit hardware registers XSP4_
 #define XSP4_SCOPE_SEL_DIG_2BIT	10			//!<  Select digital data when using 12 streams plus 2 digital per stream 
 #define XSP4_SCOPE_SEL_DIG_ALL	11			//!<  Selection for various All digital interpretations.
 
+#define XSP4_SCOPE_SEL14_FINE_TIME_TOP		14	//!< Fine time data for channels 9..8
 #define XSP4_SCOPE_SEL14_FINE_TIME			15	//!< Fine time data for channels 3..0
 
 #define XSP4_SCOPE_SEL15_ALL_RESETS			11	//!< Digital data from All channel resets

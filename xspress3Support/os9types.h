@@ -47,7 +47,7 @@ typedef int16_t   int16;
 #if defined(__MINGW32__) | defined(__MINGW64__)
 #if defined(__int8_t_defined) && 0 
 /* Becasue of yet more confusion, this tries to use the C99 standard type from stdint.h from inttypes.h */
-/* Even more confusion as __int8_defined seesm to lie a little */
+/* Even more confusiion as __int8_defined seesm to lie a little */
 typedef uint8_t u_int8;
 typedef uint16_t u_int16;
 typedef uint32_t u_int32;
@@ -66,8 +66,8 @@ typedef uint64_t u_int64_t;
 #else
 #ifdef linux
 #if defined(__int8_t_defined) && 0 
-/* Because of yet more confusion, this tries to use the C99 standard type from stdint.h from inttypes.h */
-/* Even more confusion as __int8_defined seems to lie a little */
+/* Becasue of yet more confusion, this tries to use the C99 standard type from stdint.h from inttypes.h */
+/* Even more confusiion as __int8_defined seesm to lie a little */
 typedef uint8_t u_int8;
 typedef uint16_t u_int16;
 typedef uint32_t u_int32;
