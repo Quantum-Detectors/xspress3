@@ -14,6 +14,9 @@ This file tracks changes since v3.2.8.
 ### Driver
 
 - Now use ADC clock instead of midplane for X3X2 when only a single card is present
+- setTriggerMode now only configures radial trigger if there is more than one card on
+  an X3X2 system so triggering works for single Xspress 3 Mini boxes. Additional work
+  is required to handle 2 Xspress 3 Mini boxes correctly.
 
 ### Library
 

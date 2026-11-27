@@ -403,11 +403,11 @@ asynStatus Xspress3::connect(void)
     if (xsp3_num_cards > 1 && xsp3_is_xsp3m_plus(0) == 1)
     {
       // Use midplane for multiple X3X2 cards
+      // NOTE: this would fail on a 2 Mini box, 4 channel system
       mark = 2;
       clock_src = XSP4_CLK_SRC_MIDPLN_LMK61E2;
     }
 
-    printf("Generation: %d, mark: %d, clock source: %d\n", generation, mark, clock_src);
     asynPrint(this->pasynUserSelf, ASYN_TRACE_FLOW, "%s Setting up clocks. Generation: %d Mark: %d Clock source: %d\n", functionName, generation, mark, clock_src);
     xsp3_status = xsp3->clocks_setup(
         xsp3_handle_,
@@ -1254,8 +1254,10 @@ asynStatus Xspress3::setTriggerMode(int mode, int invert_f0, int invert_veto, in
           // status = mapTriggerMode(mode, invert_f0, 0, debounce, &xsp3_trigger_mode);
           // xsp3_trigger_mode = 0;
       }
-      if (xsp3_is_xsp3m_plus(0) == 1) {
-        xsp3_trigger_mode = xsp3_trigger_mode | XSP3_GLOB_TIMA_FROM_RADIAL;
+      if (xsp3_num_cards > 1 && xsp3_is_xsp3m_plus(0) == 1) {
+          // Assume midplane for more than 1 card
+          // NOTE: this would fail on a 2 Mini box, 4 channel system
+          xsp3_trigger_mode = xsp3_trigger_mode | XSP3_GLOB_TIMA_FROM_RADIAL;
       }
       int xsp3_status = xsp3->set_glob_timeA(xsp3_handle_, card, xsp3_trigger_mode);
       if (xsp3_status != XSP3_OK) {
